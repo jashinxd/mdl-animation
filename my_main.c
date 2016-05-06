@@ -82,6 +82,16 @@
   jdyrlandweaver
   ====================*/
 void first_pass() {
+  int i;
+  for ( i = 0; i < last.op; i++ ) {
+    switch( op[i].opcode ) {
+    case FRAMES:
+      op[i].opcode = numframes;
+      break;
+    case BASENAME:
+      op[i].opcode = basename;
+      break;
+  }
 }
 
 /*======== struct vary_node ** second_pass()) ==========
