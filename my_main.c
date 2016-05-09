@@ -62,6 +62,7 @@
 #include "draw.h"
 #include "stack.h"
 
+
 /*======== void first_pass()) ==========
   Inputs:   
   Returns: 
@@ -83,14 +84,28 @@
   ====================*/
 void first_pass() {
   int i;
+  int is_frames = 0;
+  int is_vary = 0;
+  int is_basename = 0;
   for ( i = 0; i < last.op; i++ ) {
     switch( op[i].opcode ) {
-    case FRAMES:
-      op[i].opcode = numframes;
-      break;
     case BASENAME:
-      op[i].opcode = basename;
+      name = op[i].op.basename.p;
+      is_basename = 1;
       break;
+    case FRAMES:
+      num_frames = op[i].op.frames.num_frames;
+      if (!is_basename) {
+	printf("No basename given, setting basename to default value");
+	name = "default";
+      } is_frames = 1
+      break;
+    case VARY:
+      if (!is_frames) {
+	printf("Frames not found!\n");
+	exit(0);
+      }
+    }
   }
 }
 
@@ -117,6 +132,15 @@ void first_pass() {
   jdyrlandweaver
   ====================*/
 struct vary_node ** second_pass() {
+  int op_i;
+  int knob_i;
+  struct vary_node ** knobs;
+  for (op_i = 0; op_i < last.op; op_i++) {
+    if (op[op_i].opcode == VARY) {
+      for (knob_i = 0; knob_i < num_frames; knob_i++) {
+	vary_node x;
+	x->name = 
+	knobs[knob_i]
 }
 
 
