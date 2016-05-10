@@ -134,13 +134,33 @@ void first_pass() {
 struct vary_node ** second_pass() {
   int op_i;
   int knob_i;
+  double coeff;
   struct vary_node ** knobs;
+  struct vary_node * x = (vary_node *)malloc(sizeof(vary_node *));
   for (op_i = 0; op_i < last.op; op_i++) {
     if (op[op_i].opcode == VARY) {
       for (knob_i = 0; knob_i < num_frames; knob_i++) {
-	vary_node x;
-	x->name = 
-	knobs[knob_i]
+	double curr_frame = knob_i;
+	double start_frame = op[op_i].op.vary.start_frame;
+	double end_frame = op[op_i].op.vary.end_frame;
+	double start_val = op[op_i].op.vary.start_val;
+	double end_val = op[op_i].op.vary.end_val;
+	if (knob[knob_i]) {
+	  x->name = op[op_i].vary.p;
+	  if (knob_i < start_frame) {
+	    x->value = start_val;
+	  } else if (knob_i >= start_frame && <= end_frame) {
+	    if (end_val > start_val)
+	      coeff = end_val;
+	    else
+	      coeff = start_val;
+	    x->value = frame / (end_frame - start_frame) * coeff;
+	  } else {
+	    x->value = end_val;
+	    knobs[knob_i].next = x;
+      }
+    }
+  }
 }
 
 
