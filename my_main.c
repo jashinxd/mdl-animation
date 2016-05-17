@@ -348,6 +348,7 @@ void my_main( int polygons ) {
   struct vary_node **knobs;
   struct vary_node *vn;
   char frame_name[128];
+  char * frame_str;
 
   num_frames = 1;
   step = 5;
@@ -364,12 +365,18 @@ void my_main( int polygons ) {
     for (frame = 0; frame < num_frames; frame++) {
       vn = knobs[frame];
       while (vn->next) {
-	vn
-	vn = vn->next
+	process_knobs();
+	xval = vn->value * xval;
+	yval = vn->value * yval;
+	zval = vn->value * zval;
+	sprintf(frame_str, "anim/%s%03d.png", frame_name, frame);
+	save_extension( t, frame_str );
       }
     }
+  }
   
   free_stack( s );
   free_matrix( tmp );
   //free_matrix( transform );
 }
+  
