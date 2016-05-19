@@ -87,24 +87,25 @@ void first_pass() {
   int is_frames = 0;
   int is_vary = 0;
   int is_basename = 0;
-  for ( i = 0; i < last.op; i++ ) {
+  for ( i = 0; i < lastop; i++ ) {
     switch( op[i].opcode ) {
     case BASENAME:
-      frame_name = op[i].op.basename.p;
+      strcp(name, op[i].op.basename.p[BASENAME].name);
       is_basename = 1;
       break;
     case FRAMES:
       num_frames = op[i].op.frames.num_frames;
       if (!is_basename) {
 	printf("No basename given, setting basename to default value");
-	frame_name = "default";
-      } is_frames = 1
+	strcp(name, "default");
+      } is_frames = 1;
       break;
     case VARY:
       if (!is_frames) {
 	printf("Frames not found!\n");
 	exit(0);
       }
+      break;
     }
   }
 }
@@ -136,7 +137,7 @@ struct vary_node ** second_pass() {
   int knob_i;
   double coeff;
   struct vary_node ** knobs;
-  for (op_i = 0; op_i < last.op; op_i++) {
+  for (op_i = 0; op_i < lastop; op_i++) {
     if (op[op_i].opcode == VARY) {
       double start_frame = op[op_i].op.vary.start_frame;
       double end_frame = op[op_i].op.vary.end_frame;
@@ -144,11 +145,11 @@ struct vary_node ** second_pass() {
       double end_val = op[op_i].op.vary.end_val;
       for (knob_i = 0; knob_i < num_frames; knob_i++) {
 	double curr_frame = knob_i;
-	struct vary_node * x = (vary_node *)malloc(sizeof(vary_node *));
-	x->name = op[op_i].vary.p;
+	struct vary_node * x = (struct vary_node *)malloc(sizeof( struct vary_node *));
+	strcp(x->name, op[op_i].op.vary.p[VARY].name);
 	if (knob_i < start_frame) {
 	  x->value = start_val;
-	} else if (knob_i >= start_frame && <= end_frame) {
+	} else if (knob_i >= start_frame && knob_i <= end_frame) {
 	  if (end_val > start_val) {
 	    x->value = end_val * curr_frame / (end_frame - start_frame);
 	  } else {
@@ -157,7 +158,7 @@ struct vary_node ** second_pass() {
 	} else {
 	  x->value = end_val;
 	}
-	if (knob[knob_i]) {
+	if (knobs[knob_i]) {
 	  knobs[knob_i]->next = x;
 	} else {
 	  knobs[knob_i] = x;
@@ -180,7 +181,9 @@ jdyrlandweaver
 void print_knobs() {
   
   int i;
-
+  struct matrix *tmp;
+  
+   
   printf( "ID\tNAME\t\tTYPE\t\tVALUE\n" );
   for ( i=0; i < lastsym; i++ ) {
 
@@ -195,6 +198,7 @@ void print_knobs() {
 
 
 void process_knobs() {
+  int i;
   for (i=0;i<lastop;i++) {
     switch (op[i].opcode) {
 
@@ -302,6 +306,8 @@ void process_knobs() {
       break;
     }
   }
+  free_stack( s );
+  free_matrix( tmp );
 }
 
 /*======== void my_main() ==========
@@ -337,10 +343,11 @@ void process_knobs() {
 void my_main( int polygons ) {
 
   int i, f, j, frame;
+  double knob_value;
+  screen s;
   double step;
-  double xval, yval, zval, knob_value;
+  double xval, yval, zval;
   struct matrix *transform;
-  struct matrix *tmp;
   struct stack *s;
   screen t;
   color g;
@@ -374,9 +381,6 @@ void my_main( int polygons ) {
       }
     }
   }
-  
-  free_stack( s );
-  free_matrix( tmp );
   //free_matrix( transform );
 }
   
