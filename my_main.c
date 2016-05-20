@@ -90,14 +90,15 @@ void first_pass() {
   for ( i = 0; i < lastop; i++ ) {
     switch( op[i].opcode ) {
     case BASENAME:
-      strcp(name, op[i].op.basename.p[BASENAME].name);
+      printf("basename\n");
+      //strcpy(name, op[i].op.basename.p[BASENAME].name);
       is_basename = 1;
       break;
     case FRAMES:
       num_frames = op[i].op.frames.num_frames;
       if (!is_basename) {
-	printf("No basename given, setting basename to default value");
-	strcp(name, "default");
+	printf("No basename given, setting basename to default value\n");
+	//strcpy(name, "default");
       } is_frames = 1;
       break;
     case VARY:
@@ -108,6 +109,7 @@ void first_pass() {
       break;
     }
   }
+  printf("firstpass done");
 }
 
 /*======== struct vary_node ** second_pass()) ==========
@@ -146,7 +148,7 @@ struct vary_node ** second_pass() {
       for (knob_i = 0; knob_i < num_frames; knob_i++) {
 	double curr_frame = knob_i;
 	struct vary_node * x = (struct vary_node *)malloc(sizeof( struct vary_node *));
-	strcp(x->name, op[op_i].op.vary.p[VARY].name);
+	strcpy(x->name, op[op_i].op.vary.p[VARY].name);
 	if (knob_i < start_frame) {
 	  x->value = start_val;
 	} else if (knob_i >= start_frame && knob_i <= end_frame) {
@@ -197,7 +199,7 @@ void print_knobs() {
 }
 
 
-void process_knobs() {
+void process_knobs(struct matrix * tmp, struct matrix * transform, struct stack * s, screen t, color g, double xval, double yval, double zval, double step) {
   int i;
   for (i=0;i<lastop;i++) {
     switch (op[i].opcode) {
@@ -344,10 +346,10 @@ void my_main( int polygons ) {
 
   int i, f, j, frame;
   double knob_value;
-  screen s;
   double step;
   double xval, yval, zval;
   struct matrix *transform;
+  struct matrix *tmp;
   struct stack *s;
   screen t;
   color g;
@@ -366,13 +368,13 @@ void my_main( int polygons ) {
 
   first_pass();
   if (num_frames == 1) {
-    process_knobs();
+    process_knobs(tmp, transform, s, t, g, xval, yval, zval, step);
   } else {
     knobs = second_pass();
     for (frame = 0; frame < num_frames; frame++) {
       vn = knobs[frame];
       while (vn->next) {
-	process_knobs();
+	process_knobs(tmp, transform, s, t, g, xval, yval, zval, step);
 	xval = vn->value * xval;
 	yval = vn->value * yval;
 	zval = vn->value * zval;
