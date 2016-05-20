@@ -99,7 +99,9 @@ void first_pass() {
       if (!is_basename) {
 	printf("No basename given, setting basename to default value\n");
 	//strcpy(name, "default");
-      } is_frames = 1;
+      }
+      printf("frames");
+      is_frames = 1;
       break;
     case VARY:
       if (!is_frames) {
