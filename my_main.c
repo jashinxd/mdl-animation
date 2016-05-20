@@ -90,21 +90,21 @@ void first_pass() {
   for ( i = 0; i < lastop; i++ ) {
     switch( op[i].opcode ) {
     case BASENAME:
-      printf("basename\n");
-      //strcpy(name, op[i].op.basename.p[BASENAME].name);
+      strcpy(name, op[i].op.basename.p->name);
       is_basename = 1;
+      printf("basename\n");
       break;
     case FRAMES:
       num_frames = op[i].op.frames.num_frames;
       if (!is_basename) {
 	printf("No basename given, setting basename to default value\n");
-	//strcpy(name, "default");
+	strcpy(name, "default");
       }
       printf("frames");
       is_frames = 1;
       break;
     case VARY:
-      if (!is_frames) {
+      if (!is_basename && is_frames) {
 	printf("Frames not found!\n");
 	exit(0);
       }
