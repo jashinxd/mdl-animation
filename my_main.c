@@ -87,12 +87,13 @@ void first_pass() {
   int is_frames = 0;
   int is_vary = 0;
   int is_basename = 0;
+  //printf("before\n");
   for ( i = 0; i < lastop; i++ ) {
     switch( op[i].opcode ) {
     case BASENAME:
       strcpy(name, op[i].op.basename.p->name);
       is_basename = 1;
-      printf("basename\n");
+      //printf("basename\n");
       break;
     case FRAMES:
       num_frames = op[i].op.frames.num_frames;
@@ -100,18 +101,19 @@ void first_pass() {
 	printf("No basename given, setting basename to default value\n");
 	strcpy(name, "default");
       }
-      printf("frames");
+      //printf("frames");
       is_frames = 1;
       break;
     case VARY:
       if (!is_basename && is_frames) {
-	printf("Frames not found!\n");
+	//printf("Frames not found!\n");
 	exit(0);
       }
+      //printf("vary");
       break;
     }
   }
-  printf("firstpass done");
+  //printf("firstpass done\n");
 }
 
 /*======== struct vary_node ** second_pass()) ==========
@@ -150,7 +152,8 @@ struct vary_node ** second_pass() {
       for (knob_i = 0; knob_i < num_frames; knob_i++) {
 	double curr_frame = knob_i;
 	struct vary_node * x = (struct vary_node *)malloc(sizeof( struct vary_node *));
-	strcpy(x->name, op[op_i].op.vary.p[VARY].name);
+	
+	strcpy(x->name, op[op_i].op.vary.p->name);
 	if (knob_i < start_frame) {
 	  x->value = start_val;
 	} else if (knob_i >= start_frame && knob_i <= end_frame) {
@@ -159,17 +162,20 @@ struct vary_node ** second_pass() {
 	  } else {
 	    x->value = start_val * curr_frame / (end_frame - start_frame);
 	  }
+	 
 	} else {
 	  x->value = end_val;
 	}
+	
 	if (knobs[knob_i]) {
 	  knobs[knob_i]->next = x;
 	} else {
 	  knobs[knob_i] = x;
-	} 	
+	}
       }
     }
   }
+  return knobs;
 }
 
 
@@ -367,12 +373,13 @@ void my_main( int polygons ) {
   g.red = 0;
   g.green = 255;
   g.blue = 255;
-
+  printf("outside firstpass\n");
   first_pass();
   if (num_frames == 1) {
     process_knobs(tmp, transform, s, t, g, xval, yval, zval, step);
   } else {
     knobs = second_pass();
+    /*
     for (frame = 0; frame < num_frames; frame++) {
       vn = knobs[frame];
       while (vn->next) {
@@ -384,6 +391,7 @@ void my_main( int polygons ) {
 	save_extension( t, frame_str );
       }
     }
+    */
   }
   //free_matrix( transform );
 }
